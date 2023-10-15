@@ -10,7 +10,6 @@ namespace WebAPI.Repository;
 
 public class TokenRepository : ITokenRepository
 {
-
     private readonly IConfiguration _configuration;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
 
@@ -21,27 +20,32 @@ public class TokenRepository : ITokenRepository
     }
 
 
-    public async Task<AuthenticationResponse> CreateAuthenticationResponseAsync(string refreshTokenId)
+    public async Task<AuthenticationResponse?> CreateAuthenticationResponseAsync(string refreshTokenId)
     {
-       var token = await _refreshTokenRepository.GetAsync(refreshTokenId);
+        var token = await _refreshTokenRepository.GetAsync(refreshTokenId);
 
-       if (token.IsValid is false)
-       {
-           return null;
-       }
-       
-       var response = new AuthenticationResponse();
-       response.userId = token.UserId;
-        
-       SetAccessToken(response);
-       await SetRefreshTokenAsync(response);
-       return response;
+        if (token!.IsValid is false)
+        {
+            return null;
+        }
+
+        var response = new AuthenticationResponse();
+        response.userType = token.UserType;
+        response.userId = token.UserId;
+
+        SetAccessToken(response);
+        await SetRefreshTokenAsync(response);
+        return response;
     }
+
     public async Task<AuthenticationResponse> CreateAuthenticationResponseAsync(UserInfo userInfo)
     {
-        var response = new AuthenticationResponse();
-        response.userId = userInfo.id;
-        
+        var response = new AuthenticationResponse
+        {
+            userType = userInfo.UserType,
+            userId = userInfo.id
+        };
+
         SetAccessToken(response);
         await SetRefreshTokenAsync(response);
         return response;
@@ -50,6 +54,7 @@ public class TokenRepository : ITokenRepository
     private async Task SetRefreshTokenAsync(AuthenticationResponse response)
     {
         var refreshToken = new RefreshToken();
+        refreshToken.UserType = response.userType;
         refreshToken.UserId = response.userId;
         refreshToken.IsValid = true;
         refreshToken.ExpirationDateTime = DateTime.UtcNow.AddMonths(6);
@@ -57,15 +62,18 @@ public class TokenRepository : ITokenRepository
 
         response.refreshTokenId = refreshToken.id;
     }
+
     private void SetAccessToken(AuthenticationResponse response)
     {
         List<Claim> claims = new()
         {
             new Claim(ClaimTypes.UserData, response.userId),
-            new Claim(ClaimTypes.Name, response.userId)
+            new Claim(ClaimTypes.Name, response.userId),
+            new Claim(ClaimTypes.Role, response.userType.ToString()),
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
@@ -77,8 +85,8 @@ public class TokenRepository : ITokenRepository
         );
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-        
-        
+
+
         response.accessToken = jwt;
         response.accessTokenExpiration = expiration;
     }

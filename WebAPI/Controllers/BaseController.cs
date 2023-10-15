@@ -6,7 +6,7 @@ using WebAPI.Domain.Models;
 
 namespace WebAPI.Controllers;
 
-    [ApiController, AllowAnonymous]
+    [ApiController]
     public class BaseController<T> : ControllerBase where T : Entity
     {
         public IRepository<T> RepositoryConnection { get; }
@@ -16,6 +16,7 @@ namespace WebAPI.Controllers;
             RepositoryConnection = repositoryConnection;
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(string id)
         {
@@ -29,6 +30,7 @@ namespace WebAPI.Controllers;
             return Ok(item);
         }
         
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -42,6 +44,7 @@ namespace WebAPI.Controllers;
             return Ok(item);
         }
             
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] T entity)
         {
@@ -50,6 +53,7 @@ namespace WebAPI.Controllers;
             else return BadRequest("Error In Creating the Entity");
         }
         
+        [AllowAnonymous]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
@@ -58,6 +62,7 @@ namespace WebAPI.Controllers;
             else return BadRequest("Error In Deleting the Entity");
         }
         
+        [AllowAnonymous]
         [HttpPut]
         public async Task<IActionResult> UpdateAsync([FromBody] T entity)
         {

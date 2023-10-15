@@ -1,18 +1,14 @@
-using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
-using Models;
 using WebAPI.Domain.Interfaces;
 using WebAPI.Domain.Models;
-using WebAPI.Repository.LifeGuage;
-using Container = System.ComponentModel.Container;
+using WebAPI.Repository;
 
-namespace WebAPI.Repository;
+namespace WebAPITest.Repository;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddRepository(this IServiceCollection services)
     {
-        services.AddTransient<IRepository<LifePlan>, LifePlanRepository>();
         services.AddTransient<IRepository<UserInfo>, UserInfoRepository>();
         services.AddTransient<IUserInfoRepository, UserInfoRepository>();
         services.AddTransient<IRepository<PracticeSession>, PracticeSessionRepository>();

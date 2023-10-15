@@ -6,4 +6,5 @@ public class RefreshToken : Entity
     public string? UserId { get; set; }
     public DateTime ExpirationDateTime { get; set; }
     public bool IsValid { get; set; }
+    public UserType? UserType { get; set; }
 }

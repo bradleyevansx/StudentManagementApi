@@ -9,8 +9,10 @@ namespace WebAPI.Repository
 
         public CosmosConnectionManager()
         {
-            string apiurl = Environment.GetEnvironmentVariable("APIURL");
-            string connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
+            string apiurl = "https://obito-rip.documents.azure.com:443/";
+            //string apiurl = Environment.GetEnvironmentVariable("APIURL");
+            //string connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
+            string connectionString = "mZm47VxAmbhvNjRgT8CDx03kLmdMfotNW4gyptOfTB4Rl7kxBnzCwXTtcDjh6Cl8tgTuoI56HXKzACDb7QFGjw==";
             
             if (string.IsNullOrEmpty(apiurl) || string.IsNullOrEmpty(connectionString))
             {
